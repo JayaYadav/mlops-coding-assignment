@@ -59,3 +59,42 @@ Please pay attention to the required tasks specified below:
 
 - **Clone** or (Prerequisite: Authenticated to GitHub) click **"Use this template"** at the top of the repository to create your own copy 
 - Complete the tasks in your newly created repository, then share the link to your repository when you're done.
+
+## FastAPI Conversion
+
+This repository now includes a FastAPI application in `app.py` that exposes a `/predict` endpoint.
+
+### Run locally
+
+1. Create a Python environment
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+2. Start the API
+
+```bash
+uvicorn app:app --reload
+```
+
+3. Use the endpoint
+
+Send a multipart request to `/predict` with:
+- `image`: handwritten digit image file
+- `pen_pressure`: float
+- `writer_age`: integer
+- `handedness`: string (`left` or `right`)
+
+Example response:
+
+```json
+{"predicted_digit": 7}
+```
+
+### Notes
+
+- The API expects the trained artifacts `image_model.pth`, `final_classifier.pth`, and `metadata_encoder.joblib` to exist in the repository root.
+- The notebook training logic can still be used to generate those artifacts before starting the API.
