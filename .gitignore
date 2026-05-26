@@ -1,0 +1,6 @@
+*.pth
+*.joblib
+data/
+data/
+__pycache__/
+.env
