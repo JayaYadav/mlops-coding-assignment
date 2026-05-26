@@ -1,8 +1,9 @@
 import logging
 from pathlib import Path
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+import time
 
 from app.schemas import MetadataInput
 from app.predictor import MultimodalDigitPredictor
@@ -11,19 +12,42 @@ from app.predictor import MultimodalDigitPredictor
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("digit-api.main")
 
-app = FastAPI(title="MNIST Digit Prediction API (Productionized)")
+app = FastAPI(title="MNIST Digit Prediction API")
 
 PROJECT_ROOT = Path(__file__).parent.parent
 
 # Initialize predictor globally once on startup
 predictor = MultimodalDigitPredictor(project_root=PROJECT_ROOT)
 
+# Middleware to measure and log performance metrics for each request
+@app.middleware("http")
+async def add_performance_metrics(request: Request, call_next):
+    start_time = time.time()
+    
+    # Process the incoming request and get the response
+    response = await call_next(request)
+    
+    # Calculate execution duration in milliseconds
+    process_time_ms = (time.time() - start_time) * 1000
+    
+    # Inject custom monitoring headers into the response
+    response.headers["X-Process-Time-Ms"] = f"{process_time_ms:.2f}ms"
+    
+    # Log the basic performance metric
+    logger.info(
+        f"METRIC: Path={request.url.path} | "
+        f"Status={response.status_code} | "
+        f"Latency={process_time_ms:.2f}ms"
+    )
+    
+    return response
 
+# Basic health check endpoint
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
 
-
+# Main prediction endpoint
 @app.post("/predict")
 async def predict(
     image: UploadFile = File(...),
