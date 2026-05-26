@@ -98,3 +98,8 @@ Example response:
 
 - The API expects the trained artifacts `image_model.pth`, `final_classifier.pth`, and `metadata_encoder.joblib` to exist in the repository root.
 - The notebook training logic can still be used to generate those artifacts before starting the API.
+
+
+Note:
+
+The best practice is to add trained artifacts to gitignore files and not push them to the remote repo. But since the coding assignment's ask is to run the setup out-of-the-box, the artifacts are being pushed to the remote repo.
