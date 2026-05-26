@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 class MetadataInput(BaseModel):
     pen_pressure: float = Field(..., ge=0.0, le=10.0, description="Pressure value between 0 and 10.")

@@ -2,3 +2,5 @@ data/
 __pycache__/
 .env
 .gitignore
+.ruff_cache/
+.pytest_cache/

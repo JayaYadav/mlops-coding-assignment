@@ -30,16 +30,48 @@ jobs:
     # 2. LINT THE CODE (Using ruff via uv)
     - name: Lint with Ruff
       run: |
-        uv run ruff check .
+        uv run --with ruff ruff check .
 
     # 3. RUN THE TESTS
     - name: Run Tests with Pytest
       run: |
         if [ -f requirements.txt ]; then uv pip install -r requirements.txt; fi
         uv pip install pytest
-        uv run pytest
+        uv pip install --upgrade fastapi starlette
+        uv run python -m pytest -v
 
     # 4. BUILD THE SOLUTION
     - name: Build Docker Image
       run: |
         docker build -t digit-prediction-app:${{ github.sha }} .
+
+  create-release:
+    needs: ci-pipeline
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate Version Tag
+      id: tagger
+      run: |
+        VERSION="v1.0.${{ github.run_number }}"
+        echo "NEW_TAG=$VERSION" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.NEW_TAG }}
+        release_name: Release ${{ env.NEW_TAG }}
+        body: |
+          Automatic release triggered by successful PR merge.
+        draft: false
+        prerelease: false
