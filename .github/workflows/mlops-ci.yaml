@@ -5,6 +5,13 @@ on:
     branches: [ "main" ]
   push:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      run-tests:
+        description: 'Run tests'
+        required: false
+        type: boolean
+        default: 'true'
 
 jobs:
   ci-pipeline:
@@ -23,7 +30,7 @@ jobs:
     # 2. LINT THE CODE (Using ruff via uv)
     - name: Lint with Ruff
       run: |
-        uv x ruff check .
+        uv run ruff check .
 
     # 3. RUN THE TESTS
     - name: Run Tests with Pytest
