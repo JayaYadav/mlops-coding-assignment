@@ -1,10 +1,10 @@
 fastapi==0.111.1
-uvicorn[standard]==0.23.2
-torch
-torchvision
-pillow
+joblib
 numpy
 pandas
-scikit-learn
-joblib
+pillow
 python-multipart
+scikit-learn
+torch
+torchvision
+uvicorn[standard]==0.23.2
