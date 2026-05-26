@@ -1,0 +1,38 @@
+name: Digit prediction CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 1. SETUP UV
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        python-version: '3.11'
+
+    # 2. LINT THE CODE (Using ruff via uv)
+    - name: Lint with Ruff
+      run: |
+        uv x ruff check .
+
+    # 3. RUN THE TESTS
+    - name: Run Tests with Pytest
+      run: |
+        if [ -f requirements.txt ]; then uv pip install -r requirements.txt; fi
+        uv pip install pytest
+        uv run pytest
+
+    # 4. BUILD THE SOLUTION
+    - name: Build Docker Image
+      run: |
+        docker build -t digit-prediction-app:${{ github.sha }} .
