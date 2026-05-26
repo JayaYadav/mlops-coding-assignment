@@ -63,7 +63,7 @@ async def predict(
     except ValidationError as ve:
         logger.warning(f"Metadata input validation failed: {ve.errors()}")
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content={"error": "InvalidInputMetadata", "details": ve.errors()}
         )
 
